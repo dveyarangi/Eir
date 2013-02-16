@@ -18,6 +18,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import eir.terrain.TerrainFactory;
+import eir.vehicles.Helicopter;
+import eir.vehicles.HelicopterFactory;
 import eir.vehicles.Tank;
 import eir.vehicles.TankFactory;
 
@@ -74,7 +76,7 @@ public class Main extends SimpleApplication {
         rootNode.attachChild(terrain);
         rootNode.attachChild(terrainFactory.createSky());
 
-//        physics.getPhysicsSpace().setGravity(new Vector3f(0,0,0));
+        physics.getPhysicsSpace().setGravity(new Vector3f(0,-10f,0));
         TankFactory factory = new TankFactory(assetManager, physics);
         
         int TANKS = 5;
@@ -94,7 +96,18 @@ public class Main extends SimpleApplication {
         }
         //Material debugMat = assetManager.loadMaterial("Common/Materials/VertexColor.j3m");
         //terrain.generateDebugTangents(debugMat);
-
+        
+        //heli
+        //----------------------------------------------------------------------
+        HelicopterFactory heliFactory = new HelicopterFactory(assetManager, physics);
+        float heliX = 0f;
+        float heliZ = 0f;
+        float heliY = terrain.getHeightmapHeight(new Vector2f(heliX, heliZ))+100;
+        Helicopter heli = heliFactory.createHelicopter("heliId", heliX, heliY, heliZ);
+        rootNode.attachChild(heli.getNode());
+        //----------------------------------------------------------------------
+        
+        
         DirectionalLight light = new DirectionalLight();
         light.setDirection((new Vector3f(-0.1f, -0.1f, -0.1f)).normalize());
         rootNode.addLight(light);
