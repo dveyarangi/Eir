@@ -5,23 +5,16 @@
 package eir.vehicles;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.BoxCollisionShape;
-import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.control.VehicleControl;
-import com.jme3.bullet.joints.HingeJoint;
-import com.jme3.bullet.objects.PhysicsVehicle;
-import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 
@@ -48,16 +41,20 @@ public class TankFactory {
     private static final float CANNON_RADIUS = 0.2f;
     private static final float CANNON_LENGTH = 10;
     
+    private Material mat;
+
+
+    
     public TankFactory(AssetManager assetManager,BulletAppState physics)
     {
         this.assetManager = assetManager;
         this.physics = physics;
+        mat = createMaterial();
     }
     
     public Tank createTank(String tankId, float x, float y, float z)
     {
         Vector3f location = new Vector3f(x,y,z);
-        Material mat = createMaterial();
 
         //create a compound shape and attach the BoxCollisionShape for the car body at 0,1,0
         //this shifts the effective center of mass of the BoxCollisionShape to 0,-1,0
@@ -151,7 +148,7 @@ public class TankFactory {
         
         return new Tank(tankId, vehicleNode);
     }
-
+    
     public Material createMaterial() 
     {
         Material mat = new Material(assetManager,

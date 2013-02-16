@@ -150,4 +150,55 @@ public class TerrainFactory {
         return SkyFactory.createSky(assetManager, west, east, north, south, up, down);
     }
     
+    
+    public static float [] createGaussianKernel(int dim, float sigma)
+    {
+        float [] kernel = new float [dim*dim];
+        double A = 1 / (2*Math.PI*sigma*sigma);
+        double B = -1 / (2*sigma*sigma);
+        
+        int radius = dim / 2;
+        
+        float sum = 0;
+        // calculating the gaussian values:
+        for(int i = -radius; i <= radius; i ++) {
+            for(int j = -radius; j <= radius; j ++) {
+                float val = (float)(A * Math.exp((i*i + j*j) * B));
+                sum += val;
+                kernel[i + radius + (j + radius) * dim] = val;
+            }
+        }
+        
+        // normalizing:
+        for(int i = 0; i < kernel.length; i ++) {
+            kernel[i] /= sum;
+        }
+        
+        return kernel;
+    }
+
+    public float [] smoothGaussian(float [] map)
+    {
+        float [] smoothed = new float [map.length];
+        int kernelSize = 7;
+        int kernelRadius = kernelSize / 2;
+        float [] kernel = createGaussianKernel(kernelSize, 2f);
+  
+        int mapSize = (int)Math.sqrt(map.length);
+
+         for(int x = kernelRadius; x < mapSize-kernelRadius; x ++) {
+            for(int y = kernelRadius; y < mapSize-kernelRadius; y ++) {
+                float val = 0;
+                for(int i = -kernelRadius; i <= kernelRadius; i ++) {
+                    for(int j = -kernelRadius; j <= kernelRadius; j ++) {
+                        val += kernel[i + kernelRadius + (j + kernelRadius) * kernelSize] * map[x+i + (y+j)*mapSize];
+                    }
+                }
+                
+                smoothed[x + y*mapSize] = val;
+            }
+            
+         }
+        return smoothed;
+    }
 }

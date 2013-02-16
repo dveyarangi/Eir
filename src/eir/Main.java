@@ -17,11 +17,14 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+import eir.ai.AIFactory;
+import eir.ai.CriticalPoint;
 import eir.terrain.TerrainFactory;
 import eir.vehicles.Helicopter;
 import eir.vehicles.HelicopterFactory;
 import eir.vehicles.Tank;
 import eir.vehicles.TankFactory;
+import java.util.List;
 
 /**
  * test
@@ -63,6 +66,8 @@ public class Main extends SimpleApplication {
         
         
         TerrainFactory terrainFactory = new TerrainFactory(assetManager, getCamera());
+        
+        
         TerrainQuad terrain = terrainFactory.createTerrain();
         
         CollisionShape terrainShape =
@@ -94,8 +99,15 @@ public class Main extends SimpleApplication {
                 rootNode.attachChild(tank.getNode());
             }
         }
-        //Material debugMat = assetManager.loadMaterial("Common/Materials/VertexColor.j3m");
-        //terrain.generateDebugTangents(debugMat);
+        
+        AIFactory aiFactory = new AIFactory(assetManager);
+        float [] smoothHeightmap = terrainFactory.smoothGaussian(terrain.getHeightMap());
+        List <CriticalPoint> points = aiFactory.extractCriticalPoints(smoothHeightmap, terrain.getWorldScale());
+        for(CriticalPoint point : points)
+        {
+            rootNode.attachChild(aiFactory.createBeacon(point.getLocation().x, point.getLocation().y, point.getLocation().z));
+        }
+        
         
         //heli
         //----------------------------------------------------------------------
@@ -108,6 +120,9 @@ public class Main extends SimpleApplication {
         //----------------------------------------------------------------------
         
         
+        //Material debugMat = assetManager.loadMaterial("Common/Materials/VertexColor.j3m");
+        //terrain.generateDebugTangents(debugMat);
+
         DirectionalLight light = new DirectionalLight();
         light.setDirection((new Vector3f(-0.1f, -0.1f, -0.1f)).normalize());
         rootNode.addLight(light);
